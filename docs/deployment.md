@@ -31,11 +31,13 @@ npm run deploy -- --dry-run
 | Secret   | `CLOUDFLARE_API_TOKEN`  | 能部署目标 Worker、并完成所需域名操作的 Cloudflare API token |
 | Variable | `CLOUDFLARE_ACCOUNT_ID` | 目标 Cloudflare 账户 ID                                      |
 
-如何取得这些值，见 [Cloudflare GitHub Actions 部署指南](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)。共享工作流只在部署 job 中读取这个 Environment，检查 job 不使用生产凭据。调用时无需再写 `secrets: inherit`。GitHub 对这类 secrets 的处理见[可复用工作流说明](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows#using-inputs-and-secrets-in-a-reusable-workflow)。
+如何取得这些值，见 [Cloudflare GitHub Actions 部署指南](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)。调用方必须按[模板的 `secrets` 映射](../templates/static-site/.github/workflows/ci.yml)显式传递 `CLOUDFLARE_API_TOKEN`，使共享工作流可以读取这个名称对应的 secret；仅在部署 job 中声明 Environment 不足以取得它。token 仍保存在网站的 Environment 中，由部署 job 绑定环境后读取，检查 job 不使用生产凭据。
+
+这个 secret 在共享工作流接口中为可选项，让 PR 和开发分支可以只运行验证；实际部署前仍检查 token 是否为空。GitHub 对声明、传递和环境 secret 优先级的说明见[可复用工作流](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows#using-inputs-and-secrets-in-a-reusable-workflow)。
 
 ## 添加工作流
 
-将[模板的 ci.yml](../templates/static-site/.github/workflows/ci.yml)复制到网站的 `.github/workflows/ci.yml`。把 `<FULL_COMMIT_SHA>` 换成包依赖所选发布标签对应的完整 commit SHA，同一行的 `<RELEASE_TAG>` 注释填写那个具体标签，再填写站点信息：
+将[模板的 ci.yml](../templates/static-site/.github/workflows/ci.yml)复制到网站的 `.github/workflows/ci.yml`。把 `<RELEASE_TAG>` 换成与包依赖相同的不可变发布标签，保留模板中的 token 映射，再填写站点信息：
 
 | 字段                | 填写内容                                                       | 默认值       |
 | ------------------- | -------------------------------------------------------------- | ------------ |
@@ -46,7 +48,7 @@ npm run deploy -- --dry-run
 
 触发分支和并发设置也在这个文件里。生产分支的 `push` 会部署，其他调用只检查。模板将调用 job 命名为 `site`，所以 Actions 中会出现 `site / verify` 和 `site / deploy`；设置分支保护时，选择实际出现的验证检查名称。
 
-包的具体版本标签、工作流 SHA 和版本注释必须对应同一次已验证发布，并且能被本机和 CI 访问。正式版本标签发布后不移动、不复用。`uses` 中直接填写完整引用，不能用表达式拼接，也不要用 `@latest` 代替版本选择。更新时怎样核对两处引用，见[依赖与更新](dependencies.md)；调用语法见 [GitHub 可复用工作流](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows)。
+包与共享工作流的标签必须相同，对应的 GitHub Release 须标为 Immutable，并且能被本机和 CI 访问。正式版本标签发布后不移动、不复用。`uses` 中直接填写完整引用，不能用表达式拼接，也不要用 `@latest` 代替版本选择。更新时怎样核对两处引用，见[依赖与更新](dependencies.md)；调用语法见 [GitHub 可复用工作流](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows)。
 
 ### 哪些文件会发布
 

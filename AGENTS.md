@@ -6,7 +6,7 @@
 - 对外提供的配置在 `package.json` 的 `exports` 中声明，部署参数在 workflow 的 `inputs` 中声明。各项目自己维护文件路径、业务代码和部署目标。
 - 手写代码和工具支持的可执行配置优先使用 TypeScript。共享配置源码在 `configs/`，通过现有 TypeScript 编译器生成包内 JavaScript 和声明文件；不要手工维护对应实现或声明。工具规定的 JSON、JSONC、YAML 保持原生格式。
 - 共同工具在根 `package.json` 中同时声明为精确版本的 `peerDependencies` 和 `devDependencies`：前者约束使用方版本，后者供本库开发和 Dependabot 更新。升级时由 Agent 核对两处版本一致并更新锁文件；不要在模板中再复制工具版本或另建版本清单。
-- 配置包固定具体的 `vX.Y.Z` Git 标签并提交锁文件；workflow 固定同次发布的完整 Git SHA，同行注释标明标签。正式版本标签不得移动或复用，不增加 npm registry 发布流程。
+- 配置包与本库共享 workflow 统一固定同一 GitHub Immutable Release 的具体 `vX.Y.Z` 标签，并提交锁文件；第三方 Actions 仍固定完整 Git SHA，同行注释标明版本。正式发布须确认 Release 已启用不可变保护，标签不得移动或复用，不增加 npm registry 发布流程。
 - 修改配置后执行本仓库的 `verify`。修改 workflow 时，Agent 按实际风险检查语法、引用和执行行为，按需使用 actionlint 等工具。对外用法有变化时，检查实际安装和调用结果；静态检查不能证明远端运行成功。
 - 模板用于创建新工程。多个项目共用的规则放在配置包和 workflow 中，项目自己的构建与交付逻辑仍留在项目中。不为统一命令额外包装一层工具或构建框架。
 - 修改配置包或模板后，在独立目录复制模板，安装实际打包得到的配置包，再执行模板的 `verify` 和部署 dry-run。不要只检查基础库本身。

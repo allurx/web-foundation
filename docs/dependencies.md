@@ -19,7 +19,7 @@ Dependabot 支持在更新开发依赖时同步相同版本的 peer 声明。升
 | 本库的直接 npm 依赖和开发工具          | 本库的 Dependabot     | 固定完整版本；配套的 peer 声明必须同步         |
 | 本库 `.github/workflows/` 中的 Actions | 本库的 Dependabot     | 完整 SHA 旁保留对应版本注释                    |
 | 网站的基础包版本标签、锁文件和业务依赖 | 网站自己的 Dependabot | 模板配置复制到独立仓库后才生效                 |
-| 网站使用的共享工作流 SHA 和版本注释    | 网站自己的 Dependabot | 与包更新属于不同的更新路径，需要核对对应发布   |
+| 网站使用的共享工作流版本标签           | 网站自己的 Dependabot | 与包更新属于不同的更新路径，标签须保持一致     |
 | Node.js 运行时                         | 维护者                | 当前 Dependabot 配置不检查版本文件和 `engines` |
 | 模板目录中的示例和复制到网站后的文件   | 维护者                | 本库的更新不会自动改写已有网站的这些文件       |
 
@@ -31,11 +31,11 @@ TypeScript 必须处于 [typescript-eslint 的支持范围](https://typescript-e
 
 ## 基础包和工作流怎样升级
 
-配置包固定具体 Git 标签，例如 `vX.Y.Z`；工作流固定同次发布的完整 SHA，并在同行注释中标明标签。模板使用的是待替换占位符，不能直接当作已发布版本安装。
+配置包和本库共享工作流统一固定同一个不可变发布的具体 Git 标签，例如 `vX.Y.Z`。模板使用的是待替换占位符，不能直接当作已发布版本安装。第三方 Actions 仍固定完整 SHA，并保留对应版本注释。
 
-Dependabot 能识别看起来像版本号的 Git 标签，并提出新标签及锁文件更新。工作流 SHA 需要真正关联发布标签，版本注释便于阅读，也方便更新工具保留版本信息。两处应对应同一次验证过的发布；当前配置不保证它们在同一个 PR 中更新，合并前要核对。[GitHub 多生态更新分组](https://docs.github.com/en/code-security/concepts/supply-chain-security/multi-ecosystem-updates)可以合并 PR，但也不能保证两个解析器选中同一次发布。
+Dependabot 能识别看起来像版本号的 Git 标签，并提出包标签、锁文件和工作流标签的更新。两处应对应同一次验证过的发布；当前配置不保证它们在同一个 PR 中更新，合并前要核对。[GitHub 多生态更新分组](https://docs.github.com/en/code-security/concepts/supply-chain-security/multi-ecosystem-updates)可以合并 PR，但也不能保证两个解析器选中同一次发布。
 
-正式标签不得移动或复用。普通 Git 标签本身可以被修改，正式发布时应通过 [GitHub immutable releases](https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases)落实不可变发布。提交锁文件后，`npm ci` 安装其中记录的版本，不会自动升级。
+正式标签不得移动或复用。采用标签前，须确认对应的 [GitHub Release](https://github.com/allurx/web-foundation/releases) 标为 Immutable；单独的 Git 标签不具备这项保护。发布步骤见[维护说明](development.md#升级工具和共享配置)。npm 锁文件仍记录标签解析出的 commit SHA，`npm ci` 安装其中记录的版本，不会自动升级。
 
 Git URL 中的 `#latest` 和工作流中的 `@latest` 只是名为 `latest` 的 Git 引用，不代表 GitHub 最新发布；npm registry 的 `@latest` 则是 registry 的 dist-tag。本工程直接从 Git 安装，不使用这些浮动引用。
 

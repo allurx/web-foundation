@@ -11,7 +11,7 @@ SPDX-License-Identifier: Apache-2.0
 
 把本目录全部复制到新工程，隐藏文件也要保留。安装 [.node-version](.node-version) 指定的完整 Node.js LTS 版本，然后修改三处：
 
-1. 选择一个已发布并验证的 Web Foundation 版本。在 [package.json](package.json) 中把 `<RELEASE_TAG>` 换成具体的 `vX.Y.Z` 标签，在 [ci.yml](.github/workflows/ci.yml) 中填写该标签对应的 `<FULL_COMMIT_SHA>` 和同一行的版本注释。这里的占位符不是已发布版本，不能直接安装或运行；`latest` 也不表示自动选择 GitHub 的最新发布。
+1. 从 [Web Foundation Releases](https://github.com/allurx/web-foundation/releases) 选择标为 Immutable 的已验证版本。在 [package.json](package.json) 和 [ci.yml](.github/workflows/ci.yml) 中，将 `<RELEASE_TAG>` 替换为同一个具体的 `vX.Y.Z` 标签。这里的占位符不是已发布版本，不能直接安装或运行；`latest` 也不表示自动选择 GitHub 的最新发布。
 2. 在 `package.json` 填写工程名称，在 [wrangler.jsonc](wrangler.jsonc) 填写 Worker 名称，在 [index.html](index.html) 修改标题和页面内容。
 3. 把 CI 的 `production-url` 换成网站地址。它只决定部署记录中的链接；Worker 实际使用哪个域名，要在 Wrangler 配置中设置。
 
@@ -53,7 +53,7 @@ npm run deploy -- --dry-run
 
 工具版本由基础包统一指定。新增业务依赖时，[.npmrc](.npmrc) 会让 npm 保存精确版本；保留锁文件，让本地和 CI 安装相同的依赖。
 
-[Dependabot](.github/dependabot.yml)分别检查包依赖和工作流，不能保证两处自动成套更新。升级时核对包的具体标签、工作流 SHA 和版本注释对应同一次已验证发布，更新锁文件并运行 `npm run verify`，不用重新复制模板。正式标签不移动、不复用；更多更新范围见 [Web Foundation 依赖与更新](https://github.com/allurx/web-foundation/blob/main/docs/dependencies.md)。
+[Dependabot](.github/dependabot.yml)分别检查包依赖和工作流，不能保证两处自动成套更新。升级时将两处标签更新为同一个已验证的 Immutable Release，更新锁文件并运行 `npm run verify`，不用重新复制模板。正式标签不移动、不复用；更多更新范围见 [Web Foundation 依赖与更新](https://github.com/allurx/web-foundation/blob/main/docs/dependencies.md)。
 
 Node.js 运行时仍固定在本项目的 `.node-version` 和 `package.json` 的 `engines` 中。如果新版基础包要求升级 Node.js，一起修改这两个文件，通过检查后再采用。
 

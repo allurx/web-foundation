@@ -7,6 +7,11 @@ name: Static site
 # 何时运行、是否取消旧运行，由站点仓库的工作流决定。
 on:
     workflow_call:
+        secrets:
+            CLOUDFLARE_API_TOKEN:
+                description: Cloudflare deployment token from the caller environment.
+                # PR 和开发分支只验证；部署 job 读取所选环境的值并检查非空。
+                required: false
         inputs:
             asset-directory:
                 description: Verified deployment assets, relative to the caller repository root.
@@ -111,7 +116,7 @@ jobs:
         runs-on: ubuntu-24.04
         timeout-minutes: 10
         # 使用站点仓库的 Environment 及其审批规则，生产凭据也保存在那里。
-        # 验证阶段无需读取这些凭据，调用时不需要 secrets: inherit。
+        # 调用方显式映射部署 token；验证 job 不读取这个 Environment。
         environment:
             name: ${{ inputs.environment }}
             url: ${{ inputs.production-url }}
