@@ -1,0 +1,5 @@
+{
+    "extends": "@allurx/web-foundation/tsconfig/node",
+    // 检查根目录的 ESLint、Vite 等 TypeScript 配置文件。
+    "include": ["*.ts"]
+}

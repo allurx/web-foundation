@@ -1,0 +1,32 @@
+# Copyright 2026 allurx
+# SPDX-License-Identifier: Apache-2.0
+# 使用前填写同一次发布的完整提交 SHA、版本标签和真实站点地址，步骤见模板 README。
+
+name: CI
+
+# PR 只检查；推送 main 会在检查通过后部署站点。
+on:
+    pull_request:
+    push:
+        branches:
+            - main
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ci-${{ github.ref }}
+    # PR 更新时取消旧检查，生产部署则允许当前运行完成。
+    # 连续推送时，只保留一个等待中的运行，新运行会替换旧的等待项。
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+    site:
+        # SHA 必须对应 package.json 所选的发布标签；版本注释便于阅读和 Dependabot 更新。
+        # 配置分支保护时，检查名称为 site / verify。
+        uses: allurx/web-foundation/.github/workflows/static-site.yml@<FULL_COMMIT_SHA> # <RELEASE_TAG>
+        with:
+            # npm run verify 的输出目录，其中的文件会公开发布。
+            asset-directory: dist/
+            # GitHub 部署记录中的站点链接；填写这里不会自动配置域名。
+            production-url: https://example.com

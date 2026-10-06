@@ -1,0 +1,58 @@
+{
+    "name": "@allurx/web-foundation",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Shared tooling configuration and deployment workflows for Web projects.",
+    "license": "Apache-2.0",
+    "type": "module",
+    "engines": {
+        "node": "24.21.0"
+    },
+    "exports": {
+        "./eslint": "./dist/eslint.js",
+        "./prettier": "./dist/prettier.js",
+        "./vite": "./dist/vite.js",
+        "./tsconfig/base": "./tsconfig/tsconfig.base.json",
+        "./tsconfig/browser": "./tsconfig/tsconfig.browser.json",
+        "./tsconfig/node": "./tsconfig/tsconfig.node.json"
+    },
+    "files": [
+        "dist/",
+        "tsconfig/",
+        "LICENSE.txt"
+    ],
+    "scripts": {
+        "prepare": "npm run build",
+        "build": "tsc --project tsconfig.build.json",
+        "format": "prettier . --config configs/prettier.ts --write",
+        "format:check": "prettier . --config configs/prettier.ts --check",
+        "lint": "eslint . --max-warnings 0",
+        "type-check": "tsc --noEmit",
+        "check": "npm run format:check && npm run lint && npm run type-check",
+        "verify": "npm run build && npm run check"
+    },
+    "prettier": "@allurx/web-foundation/prettier",
+    "dependencies": {
+        "@eslint/js": "10.0.1",
+        "globals": "17.13.0",
+        "typescript-eslint": "8.71.1"
+    },
+    "peerDependencies": {
+        "@types/node": "24.19.1",
+        "eslint": "10.12.0",
+        "jiti": "2.7.0",
+        "prettier": "3.9.9",
+        "typescript": "6.0.3",
+        "vite": "8.3.3",
+        "wrangler": "4.147.0"
+    },
+    "devDependencies": {
+        "@types/node": "24.19.1",
+        "eslint": "10.12.0",
+        "jiti": "2.7.0",
+        "prettier": "3.9.9",
+        "typescript": "6.0.3",
+        "vite": "8.3.3",
+        "wrangler": "4.147.0"
+    }
+}

@@ -1,0 +1,97 @@
+# Copyright 2026 allurx
+# SPDX-License-Identifier: Apache-2.0
+
+name: CI
+
+# 检查基础库本身；站点的构建和部署流程在 static-site.yml 中。
+on:
+    pull_request:
+    push:
+        branches:
+            - main
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ci-${{ github.ref }}
+    # 有新提交时取消旧检查，把时间留给最新版本。
+    cancel-in-progress: true
+
+jobs:
+    # 确认共享配置在 Linux 和 Windows 上都能使用。
+    verify:
+        strategy:
+            matrix:
+                os: [ubuntu-24.04, windows-latest]
+        runs-on: ${{ matrix.os }}
+        timeout-minutes: 15
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+            - name: Set up Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: .node-version
+                  cache: npm
+            - name: Install dependencies
+              run: npm ci
+            - name: Verify shared configuration
+              run: npm run verify
+
+    # 把模板当作独立工程安装和构建，确认它能使用本次修改后的配置包。
+    template:
+        runs-on: ubuntu-24.04
+        timeout-minutes: 15
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+            - name: Set up Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: templates/static-site/.node-version
+                  cache: npm
+            - name: Install package build tools
+              run: npm ci
+            - name: Install template with the current package
+              run: |
+                  set -euo pipefail
+
+                  # 在仓库外验证，防止模板借用本仓库的依赖而掩盖安装问题。
+                  package_file="$(npm pack --silent --pack-destination "$RUNNER_TEMP")"
+                  cp -R templates/static-site "$RUNNER_TEMP/template"
+                  cd "$RUNNER_TEMP/template"
+
+                  # 用本次打出的包替换版本标签占位依赖，在发布前验证模板。
+                  # 从 GitHub 按版本标签安装仍需在发布后另行检查。
+                  npm install --package-lock-only --save-dev --save-exact "$RUNNER_TEMP/$package_file"
+                  # 再按锁文件安装，确认后续 npm ci 也能取得全部配套工具。
+                  npm ci
+            - name: Verify template
+              working-directory: ${{ runner.temp }}/template
+              run: npm run verify
+            # 检查部署配置和构建结果，不会发布到 Cloudflare。
+            - name: Validate template deployment
+              working-directory: ${{ runner.temp }}/template
+              env:
+                  WRANGLER_SEND_METRICS: "false"
+              run: npm run deploy -- --dry-run
+
+    # 分支保护只需选择这个固定名称，矩阵或检查步骤调整时无需重新配置。
+    # always() 确保前面的检查失败或被跳过时，这里也会运行并报告失败。
+    required:
+        name: CI required
+        if: ${{ always() }}
+        needs: [verify, template]
+        runs-on: ubuntu-24.04
+        timeout-minutes: 2
+        steps:
+            - name: Require every check to pass
+              env:
+                  RESULTS: ${{ toJSON(needs) }}
+              run: |
+                  jq --exit-status 'all(.[]; .result == "success")' <<< "$RESULTS"

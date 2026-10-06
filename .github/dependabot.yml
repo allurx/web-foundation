@@ -1,0 +1,27 @@
+# Copyright 2026 allurx
+# SPDX-License-Identifier: Apache-2.0
+
+version: 2
+updates:
+    - package-ecosystem: "github-actions"
+      directory: "/"
+      schedule:
+          interval: "weekly"
+    - package-ecosystem: "npm"
+      directory: "/"
+      schedule:
+          interval: "weekly"
+      # 工具在 devDependencies 和 peerDependencies 中保持同值。
+      # Dependabot 更新开发依赖时，会同步更新原版本相同的 peer 声明。
+      groups:
+          routine-updates:
+              update-types:
+                  - "minor"
+                  - "patch"
+      ignore:
+          # 升级 TypeScript 前，先确认 typescript-eslint 支持该版本。
+          - dependency-name: "typescript"
+            versions: [">=6.1.0"]
+          # @types/node 的大版本应与 .node-version 中的 Node 版本一致。
+          - dependency-name: "@types/node"
+            update-types: ["version-update:semver-major"]

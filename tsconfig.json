@@ -1,0 +1,6 @@
+{
+    // 通过包名使用配置，也能发现对外提供的导出路径是否有误。
+    "extends": "@allurx/web-foundation/tsconfig/node",
+    // 检查工具配置和共享配置源码；模板在安装依赖后单独检查。
+    "include": ["*.ts", "configs/**/*.ts"]
+}
