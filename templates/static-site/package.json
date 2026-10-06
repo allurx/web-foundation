@@ -20,7 +20,7 @@
         "deploy": "wrangler deploy"
     },
     "devDependencies": {
-        "@allurx/web-foundation": "git+https://github.com/allurx/web-foundation.git#v1.0.1"
+        "@allurx/web-foundation": "git+https://github.com/allurx/web-foundation.git#v1.0.2"
     },
     "prettier": "@allurx/web-foundation/prettier"
 }

@@ -24,7 +24,7 @@ jobs:
     site:
         # 与 package.json 使用同一个已验证的 Immutable Release 标签。
         # 配置分支保护时，检查名称为 site / verify。
-        uses: allurx/web-foundation/.github/workflows/static-site.yml@v1.0.1
+        uses: allurx/web-foundation/.github/workflows/static-site.yml@v1.0.2
         secrets: inherit
         with:
             # npm run verify 的输出目录，其中的文件会公开发布。
