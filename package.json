@@ -1,6 +1,6 @@
 {
     "name": "@allurx/web-foundation",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "private": true,
     "description": "Shared tooling configuration and deployment workflows for Web projects.",
     "license": "Apache-2.0",

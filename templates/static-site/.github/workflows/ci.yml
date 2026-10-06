@@ -1,6 +1,6 @@
 # Copyright 2026 allurx
 # SPDX-License-Identifier: Apache-2.0
-# 使用前填写同一次发布的完整提交 SHA、版本标签和真实站点地址，步骤见模板 README。
+# 使用前填写与包依赖相同的不可变发布标签和真实站点地址，步骤见模板 README。
 
 name: CI
 
@@ -22,9 +22,11 @@ concurrency:
 
 jobs:
     site:
-        # SHA 必须对应 package.json 所选的发布标签；版本注释便于阅读和 Dependabot 更新。
+        # 与 package.json 使用同一个已验证的 Immutable Release 标签。
         # 配置分支保护时，检查名称为 site / verify。
-        uses: allurx/web-foundation/.github/workflows/static-site.yml@<FULL_COMMIT_SHA> # <RELEASE_TAG>
+        uses: allurx/web-foundation/.github/workflows/static-site.yml@<RELEASE_TAG>
+        secrets:
+            CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         with:
             # npm run verify 的输出目录，其中的文件会公开发布。
             asset-directory: dist/

@@ -58,4 +58,6 @@ CI 会运行 Linux、Windows 检查和上述模板检查，最后由 `CI require
 
 TypeScript 的 `target`、`lib` 决定检查时采用的语言和 API 类型；Vite 的 `build.target` 决定浏览器文件的语法转换，两者分别维护。升级 Vite 时核对 `baseline-widely-available` 对应的浏览器范围，并重新构建和检查模板。
 
-正式发布时，为已经完成集成和验证的提交创建与 `package.json` 版本一致的 `vX.Y.Z` 标签，并记录对应的完整提交 SHA。发布前另行取得推送、标签和发布授权；已有正式标签不能移动或复用。其他网站更新包标签、工作流 SHA 及锁文件后，再运行自己的检查和构建，不需要发布到 npm registry。模板只在新建网站时复制，后续更新无需重新复制整个目录。
+正式发布前取得相应推送、标签和发布授权，并在仓库设置中[启用 Release immutability](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/establish-provenance-and-integrity/prevent-release-changes)。为已经完成集成和验证的实际发布提交创建与 `package.json` 版本一致的 annotated `vX.Y.Z` 标签，再基于该标签发布同名 GitHub Release。发布说明交代变化、使用条件与必要的升级事项；有附件时先在草稿中准备完整，再发布。现有 Git 分发方式不需要额外 npm registry 发布或二进制附件。
+
+发布后回读确认 Release 为 Immutable，标签仍指向已验证的提交。已有正式标签不得移动或复用，修复通过新版本发布。其他网站将包和共享工作流更新到同一个版本标签，更新锁文件并运行自己的检查、构建与相关部署验证。模板只在新建网站时复制，后续更新无需重新复制整个目录。
