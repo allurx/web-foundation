@@ -31,7 +31,7 @@ TypeScript 必须处于 [typescript-eslint 的支持范围](https://typescript-e
 
 ## 基础包和工作流怎样升级
 
-配置包和本库共享工作流统一固定同一个不可变发布的具体 Git 标签，例如 `vX.Y.Z`。模板使用的是待替换占位符，不能直接当作已发布版本安装。第三方 Actions 仍固定完整 SHA，并保留对应版本注释。
+配置包和本库共享工作流统一固定同一个不可变发布的具体 Git 标签，例如 `vX.Y.Z`。每次发布时同步更新模板的包依赖和工作流标签，复制后的消费者工程自行选择何时升级。第三方 Actions 仍固定完整 SHA，并保留对应版本注释。
 
 Dependabot 能识别看起来像版本号的 Git 标签，并提出包标签、锁文件和工作流标签的更新。两处应对应同一次验证过的发布；当前配置不保证它们在同一个 PR 中更新，合并前要核对。[GitHub 多生态更新分组](https://docs.github.com/en/code-security/concepts/supply-chain-security/multi-ecosystem-updates)可以合并 PR，但也不能保证两个解析器选中同一次发布。
 

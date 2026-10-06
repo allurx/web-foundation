@@ -6,7 +6,7 @@
 
 ## 开始使用
 
-**新建网站**：按[模板说明](templates/static-site/README.md)复制文件，填写项目名称和基础库发布标签，然后安装依赖、启动开发。
+**新建网站**：按[模板说明](templates/static-site/README.md)复制文件，填写项目名称和部署目标，然后安装依赖、启动开发。模板中的具体标签随基础库发布同步更新；复制后的工程由消费者按需升级。
 
 **给已有网站使用共享工具**：先准备 Git、npm，以及 [package.json](package.json) 中 `engines` 要求的 Node.js 版本。
 

@@ -9,9 +9,9 @@ SPDX-License-Identifier: Apache-2.0
 
 ## 创建网站
 
-把本目录全部复制到新工程，隐藏文件也要保留。安装 [.node-version](.node-version) 指定的完整 Node.js LTS 版本，然后修改三处：
+把本目录全部复制到新工程，隐藏文件也要保留。安装 [.node-version](.node-version) 指定的完整 Node.js LTS 版本，然后配置项目：
 
-1. 从 [Web Foundation Releases](https://github.com/allurx/web-foundation/releases) 选择标为 Immutable 的已验证版本。在 [package.json](package.json) 和 [ci.yml](.github/workflows/ci.yml) 中，将 `<RELEASE_TAG>` 替换为同一个具体的 `vX.Y.Z` 标签。这里的占位符不是已发布版本，不能直接安装或运行；`latest` 也不表示自动选择 GitHub 的最新发布。
+1. [package.json](package.json) 和 [ci.yml](.github/workflows/ci.yml) 使用相同的具体版本标签，随基础库发布同步更新。复制后需要升级时，打开 [Web Foundation 最新正式发布](https://github.com/allurx/web-foundation/releases/latest)，确认版本标为 Immutable，再在自己的工程中同步更新两处标签，保留 `secrets: inherit`。
 2. 在 `package.json` 填写工程名称，在 [wrangler.jsonc](wrangler.jsonc) 填写 Worker 名称，在 [index.html](index.html) 修改标题和页面内容。
 3. 把 CI 的 `production-url` 换成网站地址。它只决定部署记录中的链接；Worker 实际使用哪个域名，要在 Wrangler 配置中设置。
 

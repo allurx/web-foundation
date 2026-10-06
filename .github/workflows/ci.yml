@@ -66,7 +66,7 @@ jobs:
                   cp -R templates/static-site "$RUNNER_TEMP/template"
                   cd "$RUNNER_TEMP/template"
 
-                  # 用本次打出的包替换版本标签占位依赖，在发布前验证模板。
+                  # 用本次打出的包替换模板的 Git 标签依赖，在发布前验证模板。
                   # 从 GitHub 按版本标签安装仍需在发布后另行检查。
                   npm install --package-lock-only --save-dev --save-exact "$RUNNER_TEMP/$package_file"
                   # 再按锁文件安装，确认后续 npm ci 也能取得全部配套工具。

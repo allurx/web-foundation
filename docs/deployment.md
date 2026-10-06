@@ -31,13 +31,13 @@ npm run deploy -- --dry-run
 | Secret   | `CLOUDFLARE_API_TOKEN`  | 能部署目标 Worker、并完成所需域名操作的 Cloudflare API token |
 | Variable | `CLOUDFLARE_ACCOUNT_ID` | 目标 Cloudflare 账户 ID                                      |
 
-如何取得这些值，见 [Cloudflare GitHub Actions 部署指南](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)。调用方必须按[模板的 `secrets` 映射](../templates/static-site/.github/workflows/ci.yml)显式传递 `CLOUDFLARE_API_TOKEN`，使共享工作流可以读取这个名称对应的 secret；仅在部署 job 中声明 Environment 不足以取得它。token 仍保存在网站的 Environment 中，由部署 job 绑定环境后读取，检查 job 不使用生产凭据。
+如何取得这些值，见 [Cloudflare GitHub Actions 部署指南](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)。调用 job 按[模板](../templates/static-site/.github/workflows/ci.yml)设置 `secrets: inherit`；仅在共享工作流的部署 job 中声明 Environment 不足以取得环境 secret。token 仍保存在网站的 Environment 中，由部署 job 绑定环境后读取，检查 job 不使用生产凭据。
 
-这个 secret 在共享工作流接口中为可选项，让 PR 和开发分支可以只运行验证；实际部署前仍检查 token 是否为空。GitHub 对声明、传递和环境 secret 优先级的说明见[可复用工作流](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows#using-inputs-and-secrets-in-a-reusable-workflow)。
+PR 和开发分支可以在没有生产凭据时只运行验证；实际部署前仍检查凭据是否为空。继承和环境 secret 的处理见 [GitHub 可复用工作流说明](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows#using-inputs-and-secrets-in-a-reusable-workflow)。
 
 ## 添加工作流
 
-将[模板的 ci.yml](../templates/static-site/.github/workflows/ci.yml)复制到网站的 `.github/workflows/ci.yml`。把 `<RELEASE_TAG>` 换成与包依赖相同的不可变发布标签，保留模板中的 token 映射，再填写站点信息：
+将[模板的 ci.yml](../templates/static-site/.github/workflows/ci.yml)复制到网站的 `.github/workflows/ci.yml`，与包依赖使用相同版本。模板标签随发布更新；已有消费者需要新版时，从[最新正式发布](https://github.com/allurx/web-foundation/releases/latest)选择版本并同步更新两处标签。保留 `secrets: inherit`，再填写站点信息：
 
 | 字段                | 填写内容                                                       | 默认值       |
 | ------------------- | -------------------------------------------------------------- | ------------ |

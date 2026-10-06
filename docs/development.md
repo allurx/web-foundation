@@ -42,7 +42,7 @@ npm run verify
 
 修改工作流时，由 Agent 按改动风险核对语法、表达式、job 依赖及调用参数，按需使用 [actionlint](https://github.com/rhysd/actionlint) 等工具。静态检查不能验证 GitHub 上的凭据、环境设置和实际执行结果，相关行为变化仍需在目标环境中验证。
 
-修改共享配置或模板后，还要确认新网站能真正使用它们：把模板复制到仓库外，用 `npm pack` 生成的包替换模板里的 Git 占位依赖，安装后运行 `npm run verify` 和 `npm run deploy -- --dry-run`。检查所需工具是否随基础包一起安装，不要借用本仓库的 `node_modules`，否则可能漏掉包中缺文件或缺依赖的问题。这套操作已写在 [CI 的 template job](../.github/workflows/ci.yml) 中。
+修改共享配置或模板后，还要确认新网站能真正使用它们：把模板复制到仓库外，用 `npm pack` 生成的包替换模板里的 Git 标签依赖，安装后运行 `npm run verify` 和 `npm run deploy -- --dry-run`。检查所需工具是否随基础包一起安装，不要借用本仓库的 `node_modules`，否则可能漏掉包中缺文件或缺依赖的问题。这套操作已写在 [CI 的 template job](../.github/workflows/ci.yml) 中。
 
 发布或修改打包范围时，再核对实际安装包中的导出文件、类型声明和许可证是否完整。
 
@@ -50,7 +50,7 @@ npm run verify
 
 CI 会运行 Linux、Windows 检查和上述模板检查，最后由 `CI required` 汇总结果。任何一项失败、取消或跳过，汇总检查都不会通过。检查通过后，远端 Git 安装、网站调用共享工作流以及实际部署仍需分别验证。
 
-发布仓库后，让 CI 至少运行一次，再在 GitHub 为 `main` 配置分支保护：要求 PR、要求分支为最新、将 GitHub Actions 的 `CI required` 设为必需检查，并将规则应用于管理员。在仓库设置中允许 squash merge，用于依赖更新等短期分支。写在本地配置或文档中不会使这些仓库设置自动生效。
+本工程直接在 `main` 开发。推送前完成本地验证，推送后核对对应提交的 `CI required`；`main` 禁止强推和删除，不设置阻止正常直推的 PR 或预先检查门槛。依赖更新等已有 PR 仍须审查并通过检查，再按项目约定合并。分支保护和允许的合并方式在 GitHub 仓库设置中配置，文档本身不会使它们自动生效。
 
 ## 升级工具和共享配置
 
@@ -58,6 +58,6 @@ CI 会运行 Linux、Windows 检查和上述模板检查，最后由 `CI require
 
 TypeScript 的 `target`、`lib` 决定检查时采用的语言和 API 类型；Vite 的 `build.target` 决定浏览器文件的语法转换，两者分别维护。升级 Vite 时核对 `baseline-widely-available` 对应的浏览器范围，并重新构建和检查模板。
 
-正式发布前取得相应推送、标签和发布授权，并在仓库设置中[启用 Release immutability](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/establish-provenance-and-integrity/prevent-release-changes)。为已经完成集成和验证的实际发布提交创建与 `package.json` 版本一致的 annotated `vX.Y.Z` 标签，再基于该标签发布同名 GitHub Release。发布说明交代变化、使用条件与必要的升级事项；有附件时先在草稿中准备完整，再发布。现有 Git 分发方式不需要额外 npm registry 发布或二进制附件。
+正式发布前取得相应推送、标签和发布授权，并在仓库设置中[启用 Release immutability](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/establish-provenance-and-integrity/prevent-release-changes)。准备版本时，一并将模板 `package.json` 的基础包引用和 `ci.yml` 的共享工作流引用更新为本次具体标签。为已经完成集成和验证的实际发布提交创建与 `package.json` 版本一致的 annotated `vX.Y.Z` 标签，再基于该标签发布同名 GitHub Release。发布说明交代变化、使用条件与必要的升级事项；有附件时先在草稿中准备完整，再发布。现有 Git 分发方式不需要额外 npm registry 发布或二进制附件。
 
 发布后回读确认 Release 为 Immutable，标签仍指向已验证的提交。已有正式标签不得移动或复用，修复通过新版本发布。其他网站将包和共享工作流更新到同一个版本标签，更新锁文件并运行自己的检查、构建与相关部署验证。模板只在新建网站时复制，后续更新无需重新复制整个目录。
